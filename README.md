@@ -1,12 +1,12 @@
 # test_clojure
 
-A Clojure library designed to ... well, that part is up to you.
+A Clojure library designed to AI
 
 ## Usage
 
 FIXME
 
-## License
+## License~~~~~~~~
 
 Copyright © 2023 FIXME
 
