@@ -5,5 +5,7 @@
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[org.clojure/clojure "1.11.1"]
                  [org.tensorflow/tensorflow "1.15.0"]
-                 [net.mikera/core.matrix "0.62.0"]]
-  :repl-options {:init-ns test-clojure.core})
+                 [ring/ring-core "1.9.3"]
+                 [ring/ring-jetty-adapter "1.9.3"]
+                 [seancorfield/next.jdbc "1.1.613"]]
+  :repl-options {:init-ns app.server})
