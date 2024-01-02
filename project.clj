@@ -7,5 +7,8 @@
                  [org.tensorflow/tensorflow "1.15.0"]
                  [ring/ring-core "1.9.3"]
                  [ring/ring-jetty-adapter "1.9.3"]
-                 [seancorfield/next.jdbc "1.1.613"]]
+                 [org.clojure/java.jdbc "0.7.9"]
+                 [org.postgresql/postgresql "42.2.5"]
+                 [buddy/buddy-hashers "2.0.167"]
+                 [compojure "1.6.2"]]
   :repl-options {:init-ns app.server})
