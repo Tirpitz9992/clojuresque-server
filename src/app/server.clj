@@ -4,11 +4,14 @@
             [clojure.java.jdbc :as jdbc]
             [clojure.string :as str]
             [compojure.core :refer [POST defroutes]]
+            [compojure.core :refer [GET POST defroutes]]
             [compojure.route :as route]
             [ring.adapter.jetty :as jetty]
             [ring.middleware.json :refer [wrap-json-body]]
             [ring.middleware.params :refer [wrap-params]]
-            [ring.util.response :as response])
+            [ring.util.response :as response]
+            [ring.middleware.cors :refer [wrap-cors]]
+            )
   (:import java.util.UUID))
 
 ;;在 Clojure 中，当您想要使用 Java 类时，应该使用 :import 而不是 :require 或 :use。:require 和 :use 是用于 Clojure 命名空间的，而 :import 是用于 Java 类的。所以，您应该将 (:import [java.util.UUID :as UUID]) 改为 (:import [java.util UUID])。
@@ -63,33 +66,34 @@
           (response/content-type "application/json")
           (assoc :status 400)))));; 如果用户名或密码未提供，返回一个错误信息的JSON响应，并设置状态码为400
 
+(defn get-daily-wish-data-handler [request]
+  ;; 从数据库获取最新一条
+  (let [wish-date (jdbc/query db-spec
+                              ["SELECT * FROM DailyWishCardData ORDER BY id DESC LIMIT 1"])]
+    (println wish-date)
+    (if (empty? wish-date)
+      (response/response (json/encode {:message "没有找到心愿"}))
+      (response/response (json/encode (first wish-date))))))
+
+;(println (jdbc/query db-spec ["SELECT * FROM DailyWishCardData ORDER BY id DESC LIMIT 1"]))
 
 
 (defroutes app-routes
+           (GET "/daily-wish" [] get-daily-wish-data-handler) ;路由每日许愿
            (POST "/login" req ;; 创建路由 /login
              (login-handler req))
            (route/not-found "Not Found"))
 
-(defn hash-password-for-user [user-id new-plain-password]
-  (let [hashed-password (hashers/derive new-plain-password)]
-    (jdbc/update! db-spec :users
-                  {:password hashed-password}
-                  ["id=?" user-id])))
-
-;;为特定用户hash密码
-
-(defn add-dailywishcard-data [imageuri wishtext contenttext]
-  ;;添加每日心愿签数据
-  (jdbc/with-db-connection [con db-spec]
-  (jdbc/insert! con :DailyWishCardData {:imageuri imageuri :wishtext wishtext :contenttext contenttext})))
-
-
-;(add-dailywishcard-data "https://images.pexels.com/photos/5312571/pexels-photo-5312571.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" "今天的心愿是..." "当初升的又玫瑰色手指的黎明呈现时， 人们拥到闻名的赫克托尔的火葬堆周围。 在他们聚在一起，集合停当的时候， 他们先用晶莹的酒把火葬堆上 火力到达地方的余烬全部浇灭， 然后死者的弟兄和伴侣收集白骨， 大声哀悼痛哭，流下满脸的眼泪。 他们把骨殖捡起来，放在黄金的坛里， 用柔软的紫色料子把它们遮盖起来。 他们很快把坛子放进一个墓穴， 用大块大块的石头密密层层地盖起来， 迅速垒上坟堆，同时四面放哨， 防备那些戴胫甲的阿开奥斯人攻击。 坟堆垒好以后，他们就回到城里， 集合起来，在宙斯养育的特洛亚国王 普里阿摩斯的宫殿吃一顿丰盛筵席。 他们是这样为驯马的赫克托尔举行葬礼。")
-
+(def app
+  (-> app-routes
+      (wrap-json-body)
+      (wrap-params)
+      (wrap-cors :allow-origin ["*"] ;允许所有ip访问
+                 :allow-methods [:get :post :put :delete :options] ;指定允许的HTTP请求方法，[:get :post :put :delete :options]
+                 :allow-headers ["Content-Type" "Authorization"];指定在实际请求中可以使用哪些HTTP头
+                 :max-age 3600 ;表示预检请求的结果（即对特定资源的CORS配置）可以被缓存多长时间（以秒为单位）。3600表示预检请求的结果可以被缓存一个小时。
+                 :credentials true)));当设置为true时，表示响应可以暴露给前端JavaScript代码，即使请求是来自不同源的。这通常用于控制是否应该发送cookies或HTTP认证信息。
 (defn -main []
-  (jetty/run-jetty (->
-                     app-routes
-                     (wrap-params)
-                     (wrap-json-body)) ;; 使用ring.middleware.json中间件来自动解析JSON请求体，并将其放入请求的:body键中
-     {:port 3000}))
+  (jetty/run-jetty app {:port 3000}))
+
 

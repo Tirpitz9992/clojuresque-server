@@ -11,5 +11,6 @@
                  [org.postgresql/postgresql "42.2.5"]
                  [buddy/buddy-hashers "2.0.167"]
                  [compojure "1.6.2"]
-                 [ring/ring-json "0.5.0"]]
+                 [ring/ring-json "0.5.0"]
+                 [ring-cors "0.1.13"]]
   :repl-options {:init-ns app.server})
