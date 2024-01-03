@@ -78,6 +78,13 @@
 
 ;;为特定用户hash密码
 
+(defn add-dailywishcard-data [imageuri wishtext contenttext]
+  ;;添加每日心愿签数据
+  (jdbc/with-db-connection [con db-spec]
+  (jdbc/insert! con :DailyWishCardData {:imageuri imageuri :wishtext wishtext :contenttext contenttext})))
+
+
+;(add-dailywishcard-data "https://images.pexels.com/photos/5312571/pexels-photo-5312571.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" "今天的心愿是..." "当初升的又玫瑰色手指的黎明呈现时， 人们拥到闻名的赫克托尔的火葬堆周围。 在他们聚在一起，集合停当的时候， 他们先用晶莹的酒把火葬堆上 火力到达地方的余烬全部浇灭， 然后死者的弟兄和伴侣收集白骨， 大声哀悼痛哭，流下满脸的眼泪。 他们把骨殖捡起来，放在黄金的坛里， 用柔软的紫色料子把它们遮盖起来。 他们很快把坛子放进一个墓穴， 用大块大块的石头密密层层地盖起来， 迅速垒上坟堆，同时四面放哨， 防备那些戴胫甲的阿开奥斯人攻击。 坟堆垒好以后，他们就回到城里， 集合起来，在宙斯养育的特洛亚国王 普里阿摩斯的宫殿吃一顿丰盛筵席。 他们是这样为驯马的赫克托尔举行葬礼。")
 
 (defn -main []
   (jetty/run-jetty (->
