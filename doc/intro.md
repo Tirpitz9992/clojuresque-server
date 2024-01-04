@@ -61,3 +61,10 @@ __ff__source[{"url":"https://clojure.github.io/clojure/","title":"Overview - Clo
                  :max-age 3600 ;表示预检请求的结果（即对特定资源的CORS配置）可以被缓存多长时间（以秒为单位）。3600表示预检请求的结果可以被缓存一个小时。
                  :credentials true)));当设置为true时，表示响应可以暴露给前端JavaScript代码，即使请求是来自不同源的。这通常用于控制是否应该发送cookies或HTTP认证信息。
 ```
+
+
+使用命令来测试端口路由状态
+```bash
+ Invoke-WebRequest -Uri http://192.168.88.252:3000/message -Method POST
+ -ContentType "application/json" -Body '{"message": "test", "sender": "testSender"}'
+```
