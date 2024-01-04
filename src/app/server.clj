@@ -66,6 +66,20 @@
           (response/content-type "application/json")
           (assoc :status 400)))));; 如果用户名或密码未提供，返回一个错误信息的JSON响应，并设置状态码为400
 
+
+(defn insert-message [db-spec sender message timestamp]
+  (jdbc/with-db-transaction [t-con db-spec]
+                            (jdbc/insert! t-con :messages {:sender sender :message message :timestamp timestamp})))
+
+
+(defn send-message-handler [req]
+  (let [message (-> req :body :message)
+        sender (-> req :body :sender)
+        timestamp (java.time.Instant/now)]
+    (insert-message db-spec sender message timestamp)
+    {:status 200 :body {:message "Message sent successfully."}}))
+
+
 (defn get-daily-wish-data-handler [request]
   ;; 从数据库获取最新一条
   (let [wish-date (jdbc/query db-spec
@@ -79,6 +93,8 @@
 
 
 (defroutes app-routes
+           (POST "/send-message" req
+             (send-message-handler req))
            (GET "/daily-wish" [] get-daily-wish-data-handler) ;路由每日许愿
            (POST "/login" req ;; 创建路由 /login
              (login-handler req))
