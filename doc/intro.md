@@ -68,3 +68,58 @@ __ff__source[{"url":"https://clojure.github.io/clojure/","title":"Overview - Clo
  Invoke-WebRequest -Uri http://192.168.88.252:3000/message -Method POST
  -ContentType "application/json" -Body '{"message": "test", "sender": "testSender"}'
 ```
+
+jdbc的一些使用
+
+```clojure
+;; 创建新表的函数
+(defn create-table []
+  ;; 使用jdbc执行SQL语句
+  (jdbc/with-db-connection [conn db-spec]
+    ;; 使用jdbc的execute!函数执行创建表的SQL语句
+    (jdbc/execute! conn
+                   ;; SQL语句字符串，创建名为"users"的表
+                   ;; 包含id, username, 和password三个字段
+                   ["CREATE TABLE users (
+                      id INT AUTO_INCREMENT PRIMARY KEY,
+                      username VARCHAR(50),
+                      password VARCHAR(50)
+                    )"])))
+
+;; 调用函数创建表
+(create-table)
+```
+
+1. **查看所有表**：
+   查询`information_schema.tables`视图来查看数据库中所有的表。
+
+   ```sql
+   SELECT table_name
+   FROM information_schema.tables
+   WHERE table_schema = 'public';
+   ```
+
+   这将列出数据库中所有的表
+
+2. **查看特定表的结构**：
+   使用`\d`或`\dt`命令，或者查询`information_schema.columns`视图。
+
+   ```sql
+   SELECT column_name, data_type, is_nullable
+   FROM information_schema.columns
+   WHERE table_name = 'goods';
+   ```
+
+  
+
+3. **使用psql命令行工具**：
+   如果使用的是psql命令行工具，可以直接在命令行中输入以下命令来查看表结构：
+
+   ```sh
+   \d goods
+   ```
+
+
+   ```sh
+   \dt
+   ```

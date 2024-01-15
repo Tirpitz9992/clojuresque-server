@@ -10,7 +10,7 @@
   ;; 从数据库获取最新一条
   (let [wish-date (jdbc/query db-spec
                               ["SELECT * FROM DailyWishCardData ORDER BY id DESC LIMIT 1"])]
-    (println wish-date)
+    ;(println wish-date)
     (if (empty? wish-date)
       (response/response (json/encode {:message "没有找到心愿"}))
       (response/response (json/encode (first wish-date))))))
